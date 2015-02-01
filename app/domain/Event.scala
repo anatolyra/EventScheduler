@@ -1,6 +1,5 @@
 package domain
 
-import org.quartz.{Job, JobExecutionContext}
 import play.api.libs.json._
 
 /**

@@ -40,6 +40,6 @@ class EventSchedulerIT extends SequentialSpecification {
   trait Context extends WithApplication {
     implicit val timeout = Timeout(100, TimeUnit.MILLISECONDS)
 
-    val event = Event("Meeting", "http://home.com", "")
+    val event = Event("Meeting", "http://home.com", "0,15,30,45 * * * * ?")
   }
 }
