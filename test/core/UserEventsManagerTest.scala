@@ -1,7 +1,7 @@
 package core
 
 import domain.{EventTrigger, EventExecutor, Event, UserEvents}
-import drivers.SormDriver
+import drivers.{SchedulerSupport, SormDriver}
 import org.quartz.Scheduler
 import org.specs2.matcher.{ThrownExpectations, Matcher}
 import org.specs2.mock.Mockito
@@ -43,15 +43,12 @@ class UserEventsManagerTest extends SpecificationWithJUnit with Mockito with Thr
     events.contain(===) ^^ { (_: UserEvents).events aka "events"}
   }
 
-  trait Context extends Scope with SormDriver with After with Before {
+  trait Context extends Scope with SormDriver with After with Before with SchedulerSupport {
     val scheduler = mock[Scheduler]
     val eventsManager = new UserEventsManager(scheduler)
 
-    val userName = "anatoly"
-    val event = Event("123", "234", "0,15,30,45 * * * * ?")
-
-    val job = new EventExecutor[Event](event, Event => Unit).buidWith(event.title, userName)
-    val trigger = EventTrigger.newTriggerWith(event.title, userName, event.schedule)
+    lazy val userName = "anatoly"
+    lazy val event = Event("123", "234", "0,15,30,45 * * * * ?")
 
     override def after = {
       initDB

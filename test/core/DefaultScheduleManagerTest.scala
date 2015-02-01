@@ -1,6 +1,7 @@
 package core
 
-import domain.{EventTrigger, EventExecutor, Event}
+import domain.Event
+import drivers.SchedulerSupport
 import org.quartz.Scheduler
 import org.specs2.matcher.ThrownExpectations
 import org.specs2.mock.Mockito
@@ -14,7 +15,7 @@ import org.specs2.specification.Scope
 class DefaultScheduleManagerTest extends SpecificationWithJUnit with Mockito with ThrownExpectations {
   "ScheduleManager" should {
     "add an event to the scheduler" in new Context {
-      scheduleManager.addScheduledEvent(event)
+      scheduleManager.addScheduledEvent(event)(userName)
 
       there was one(scheduler).scheduleJob(job, trigger)
     }
@@ -22,14 +23,11 @@ class DefaultScheduleManagerTest extends SpecificationWithJUnit with Mockito wit
     "fire scheduled events" in pending
   }
 
-  trait Context extends Scope {
-    implicit val user = "anatoly"
+  trait Context extends Scope with SchedulerSupport {
     val scheduler = mock[Scheduler]
     val scheduleManager = new DefaultScheduleManager(scheduler)
 
-    val event = Event("123", "234", "0,15,30,45 * * * * ?")
-
-    val job = new EventExecutor[Event](event, Event => Unit).buidWith(event.title, user)
-    val trigger = EventTrigger.newTriggerWith(event.title, user, event.schedule)
+    lazy val userName = "anatoly"
+    lazy val event = Event("123", "234", "0,15,30,45 * * * * ?")
   }
 }
