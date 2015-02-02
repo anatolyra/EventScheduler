@@ -15,11 +15,6 @@ object Application extends Controller {
   }
 
   def addEvent(userName: String) = Action { request =>
-
-    println("------------------ Request Json ------------------------")
-    println(request.body.asJson)
-    println("--------------------------------------------------------\n")
-
     val event = request.body.asJson.get.as[Event]
 
     eventManager.addEvent(userName, event)
