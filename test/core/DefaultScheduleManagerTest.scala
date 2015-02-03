@@ -1,6 +1,6 @@
 package core
 
-import domain.{DefaultEventScheduler, Event}
+import domain.Event
 import drivers.SchedulerSupport
 import org.quartz.Scheduler
 import org.specs2.matcher.ThrownExpectations
@@ -20,10 +20,7 @@ class DefaultScheduleManagerTest extends SpecificationWithJUnit with Mockito wit
       there was one(scheduler).scheduleJob(job, trigger)
     }
 
-    "fire scheduled events" in pending /*new Context {
-      override val scheduler = DefaultEventScheduler.defaultScheduler
-      scheduler.
-    }*/
+    "fire scheduled events" in pending
   }
 
   trait Context extends Scope with SchedulerSupport {

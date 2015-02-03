@@ -18,20 +18,34 @@ import support.SequentialSpecification
 class EventSchedulerIT extends SequentialSpecification {
   "Event scheduler" should {
     "return a status code 200 with the user name for which the event was added" in new Context {
-      val request = FakeRequest(POST, "/event?user=ori").withJsonBody(event)
-      val result = route(request).get
+      val response = route(FakeRequest(POST, "/event?username=ori&password=12345").withJsonBody(event)).get
 
-      contentAsString(result) must contain ("ori")
+      status(response) must equalTo(OK)
+      contentAsString(response) must contain ("ori")
     }
 
     "return the events of the requested user" in new Context {
-      val postEvent = route(FakeRequest(POST, "/event?user=asaf").withJsonBody(event)).get
+      val postEventResponse = route(FakeRequest(POST, "/event?username=asaf&password=1234").withJsonBody(event)).get
 
-      status(postEvent) must equalTo(OK)
+      status(postEventResponse) must equalTo(OK)
 
-      val getEvents = route(FakeRequest(GET, "/events?user=asaf")).get
+      val getEventsResponse = route(FakeRequest(GET, "/events?username=asaf&password=1234")).get
 
-      contentAsJson(getEvents) mustEqual Json.toJson(UserEvents(Seq(event)))
+      contentAsJson(getEventsResponse) mustEqual Json.toJson(UserEvents(Seq(event)))
+    }
+
+    "not allow unknown users in" in new WithApplication{
+      val response = route(FakeRequest(GET, "/events?username=unknown&password=1234")).get
+
+      status(response) must equalTo(FORBIDDEN)
+      contentAsString(response) must contain("Invalid username or password")
+    }
+
+    "not allow known users with incorrect passwords in" in new WithApplication{
+      val response = route(FakeRequest(GET, "/events?username=anatoly&password=incorrect")).get
+
+      status(response) must equalTo(FORBIDDEN)
+      contentAsString(response) must contain("Invalid username or password")
     }
   }
 
